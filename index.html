@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Osservazioni">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Osservazioni rapide</title>
+<style>
+:root {
+  --bg: #f6f5f2; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a66; --line: #dddbd5;
+  --accent: #2f5d8a; --plus: #1f7a4d; --plus-bg: #dcf1e5; --minus: #9a4a00; --minus-bg: #fde6cf;
+  --warn-bg: #fff4d6; --warn-ink: #6b4d00; --danger: #b3261e;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161615; --panel: #1f1f1d; --ink: #ecebe7; --muted: #a09f99; --line: #34332f;
+    --accent: #8db4dc; --plus: #7fd3a6; --plus-bg: #183a29; --minus: #f2b27a; --minus-bg: #452a12;
+    --warn-bg: #3a3114; --warn-ink: #f0d98a; --danger: #f28b82;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161615; --panel: #1f1f1d; --ink: #ecebe7; --muted: #a09f99; --line: #34332f;
+  --accent: #8db4dc; --plus: #7fd3a6; --plus-bg: #183a29; --minus: #f2b27a; --minus-bg: #452a12;
+  --warn-bg: #3a3114; --warn-ink: #f0d98a; --danger: #f28b82;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  -webkit-text-size-adjust: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+header { position: sticky; top: 0; z-index: 5; background: var(--panel); border-bottom: 1px solid var(--line);
+  padding: calc(env(safe-area-inset-top) + 8px) 16px 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+header select, header input[type=date] { height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+header .spazio { flex: 1; }
+nav { display: flex; gap: 4px; }
+nav button { height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); cursor: pointer; }
+nav button[aria-pressed="true"] { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+.freccia { width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); cursor: pointer; }
+main { padding: 12px 16px 48px; max-width: 980px; margin: 0 auto; }
+.avviso { background: var(--warn-bg); color: var(--warn-ink); border-radius: 8px; padding: 10px 12px; margin: 0 0 12px; font-size: 14px; }
+.avviso button { margin-left: 8px; border: 0; background: transparent; color: inherit; text-decoration: underline; cursor: pointer; }
+.info { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
+
+table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+thead th { position: sticky; top: var(--hh, 58px); background: var(--panel); z-index: 2; font-size: 13px; font-weight: 600;
+  color: var(--muted); padding: 8px 4px; border-bottom: 1px solid var(--line); text-align: center; }
+thead th.nome { text-align: left; }
+td { border-bottom: 1px solid var(--line); padding: 3px 4px; vertical-align: middle; }
+td.n { width: 34px; text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; padding-right: 8px; }
+td.nome { font-size: 15px; cursor: pointer; }
+td.c { width: 64px; text-align: center; }
+td.c button, td.c .nb { width: 56px; height: 44px; border-radius: 8px; border: 1px solid var(--line); background: transparent;
+  font-size: 22px; font-weight: 700; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+td.c button.piu { background: var(--plus-bg); color: var(--plus); border-color: transparent; }
+td.c button.meno { background: var(--minus-bg); color: var(--minus); border-color: transparent; }
+td.c .nb { font-size: 17px; font-weight: 400; color: var(--muted); }
+td.c .nb.ha { color: var(--accent); border-color: var(--accent); }
+tr.riga-nota td { padding: 0 8px 10px 42px; border-bottom: 1px solid var(--line); }
+tr.riga-nota textarea { width: 100%; min-height: 64px; border: 1px solid var(--line); border-radius: 8px; padding: 8px; background: var(--bg); resize: vertical; }
+tr.attiva td.nome { font-weight: 600; }
+
+section.scheda { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+section.scheda h2 { font-size: 17px; margin: 0 0 8px; }
+section.scheda p { margin: 6px 0; }
+label.campo { display: block; font-weight: 600; font-size: 14px; margin: 10px 0 4px; }
+input.testo, textarea.elenco { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--bg); }
+textarea.elenco { min-height: 220px; font-family: ui-monospace, Menlo, monospace; font-size: 14px; }
+.bottoni { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.btn { min-height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
+.btn.primario { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+.btn.pericolo { color: var(--danger); border-color: var(--danger); }
+.riga-classe { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.riga-classe:first-of-type { border-top: 0; }
+.riga-classe .nomecl { font-weight: 600; min-width: 60px; }
+.riga-classe .det { color: var(--muted); font-size: 14px; flex: 1; }
+.vuoto { text-align: center; color: var(--muted); padding: 40px 16px; }
+@media (max-width: 560px) {
+  main { padding-left: 8px; padding-right: 8px; }
+  td { padding: 3px 1px; } td.n { width: 24px; padding-right: 4px; font-size: 13px; }
+  td.c { width: 42px; } td.c button, td.c .nb { width: 40px; height: 42px; font-size: 20px; }
+  td.nome { font-size: 14px; }
+  thead th { font-size: 11px; padding: 6px 1px; }
+  tr.riga-nota td { padding-left: 8px; }
+}
+</style>
+</head>
+<body>
+<header id="testata">
+  <select id="sel-classe" aria-label="Classe"></select>
+  <button class="freccia" id="prec" aria-label="Giorno precedente">‹</button>
+  <input type="date" id="sel-data" aria-label="Data">
+  <button class="freccia" id="succ" aria-label="Giorno successivo">›</button>
+  <span class="spazio"></span>
+  <nav>
+    <button data-vista="griglia" aria-pressed="true">Griglia</button>
+    <button data-vista="classi" aria-pressed="false">Classi</button>
+    <button data-vista="esporta" aria-pressed="false">Esporta</button>
+  </nav>
+</header>
+
+<main>
+  <div id="avvisi"></div>
+
+  <div id="v-griglia"></div>
+
+  <div id="v-classi" hidden>
+    <section class="scheda">
+      <h2 id="titolo-form">Nuova classe</h2>
+      <label class="campo" for="f-nome">Classe (uguale a quella del foglio, es. 4A)</label>
+      <input class="testo" id="f-nome" autocapitalize="characters" autocomplete="off">
+      <label class="campo" for="f-elenco">Studenti, uno per riga, nell'ordine del registro</label>
+      <textarea class="elenco" id="f-elenco" placeholder="Cognome Nome&#10;Cognome Nome&#10;…&#10;&#10;oppure, copiando dal foglio Studenti le colonne N e Cognome Nome:&#10;1	Cognome Nome"></textarea>
+      <p class="info">Se una riga comincia con un numero, uso quel numero; altrimenti numero in ordine. Il numero è ciò che collega l'osservazione allo studente nel foglio.</p>
+      <div class="bottoni">
+        <button class="btn primario" id="f-salva">Salva classe</button>
+        <button class="btn" id="f-annulla" hidden>Annulla modifica</button>
+      </div>
+      <p id="f-msg" class="info"></p>
+    </section>
+    <section class="scheda">
+      <h2>Classi sul dispositivo</h2>
+      <div id="lista-classi"></div>
+    </section>
+  </div>
+
+  <div id="v-esporta" hidden>
+    <section class="scheda">
+      <h2>Esporta per il foglio</h2>
+      <p class="info">Il file contiene classe, data, numero, segni e annotazioni. Non contiene i nomi. Importalo nel foglio della classe con Valutazione › Importa osservazioni dall'iPad. Puoi esportare quante volte vuoi: le righe già importate vengono aggiornate, non duplicate.</p>
+      <div id="lista-esporta"></div>
+    </section>
+    <section class="scheda">
+      <h2>Copia di sicurezza</h2>
+      <p class="info">Tutto ciò che c'è sul dispositivo, nomi compresi, in un file da tenere sul Mac. Serve a ripristinare i dati se l'iPad li perde o se cambi dispositivo.</p>
+      <div class="bottoni">
+        <button class="btn" id="backup">Salva copia di sicurezza</button>
+        <label class="btn" style="display:inline-flex;align-items:center">Ripristina da copia…<input type="file" id="ripristina" accept=".json,application/json" hidden></label>
+      </div>
+      <p id="b-msg" class="info"></p>
+    </section>
+    <section class="scheda">
+      <h2>Dove stanno i dati</h2>
+      <p class="info">Solo nella memoria di questo dispositivo: nessun invio in rete. Se cancelli i dati dei siti di Safari, o disinstalli l'icona dalla schermata Home, si perdono: per questo c'è la copia di sicurezza.</p>
+      <p class="info" id="stato-memoria"></p>
+    </section>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var KEY = 'osservazioni-rapide-v1';
+  var ASPETTI = [['PAR', 'Partecip.', 'Partecipazione'], ['IMP', 'Impegno', 'Impegno'],
+                 ['COL', 'Collab.', 'Collaborazione'], ['USO', 'Uso risc.', 'Uso dei riscontri']];
+  var S = { classi: {}, rec: {}, esportato: {}, attiva: '' };
+  var memoriaOk = true;
+  var notaAperta = null;
+  var modifica = null;
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function oggi() { var d = new Date(); return iso(d); }
+  function iso(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function spostaGiorno(s, k) { var p = s.split('-').map(Number); return iso(new Date(p[0], p[1] - 1, p[2] + k)); }
+  function dataIt(s) { var p = s.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+
+  function carica() {
+    try {
+      var t = localStorage.getItem(KEY);
+      if (t) { var o = JSON.parse(t); S.classi = o.classi || {}; S.rec = o.rec || {}; S.esportato = o.esportato || {}; S.attiva = o.attiva || ''; }
+    } catch (e) { memoriaOk = false; }
+  }
+  function salva() {
+    try { localStorage.setItem(KEY, JSON.stringify(S)); memoriaOk = true; }
+    catch (e) { memoriaOk = false; mostraAvvisi(); }
+  }
+
+  function standalone() {
+    return window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  }
+
+  function mostraAvvisi() {
+    var h = '';
+    if (!memoriaOk) h += '<div class="avviso">La memoria del dispositivo non è disponibile: quello che inserisci non viene salvato. Esci dalla navigazione privata o controlla le impostazioni di Safari.</div>';
+    if (!standalone()) h += '<div class="avviso">Aggiungi questa pagina alla schermata Home (Condividi › Aggiungi a Home) e usala da lì, <b>prima</b> di inserire le classi: aperta da Safari, i dati possono essere cancellati dopo alcuni giorni di inattività, e l\'app sulla Home ha una memoria separata da quella di Safari.</div>';
+    var c = S.attiva;
+    if (c && contaRecord(c) > 0) {
+      var ult = S.esportato[c] || 0;
+      var ultMod = ultimaModifica(c);
+      if (ultMod > ult && Date.now() - (ult || ultMod) > 7 * 864e5) {
+        h += '<div class="avviso">Osservazioni di ' + esc(c) + ' non esportate da più di una settimana.<button data-vai="esporta">Esporta</button></div>';
+      }
+    }
+    $('avvisi').innerHTML = h;
+  }
+
+  function contaRecord(c, d) {
+    var n = 0;
+    Object.keys(S.rec).forEach(function (k) {
+      var p = k.split('|');
+      if (p[0] === c && (!d || p[1] === d) && pieno(S.rec[k])) n++;
+    });
+    return n;
+  }
+  function ultimaModifica(c) {
+    var m = 0;
+    Object.keys(S.rec).forEach(function (k) { if (k.split('|')[0] === c) m = Math.max(m, S.rec[k].t || 0); });
+    return m;
+  }
+  function pieno(r) { return !!(r && (r.PAR || r.IMP || r.COL || r.USO || (r.nota && r.nota.trim()))); }
+
+  /* ---------------- vista griglia */
+
+  function renderSelettori() {
+    var nomi = Object.keys(S.classi).sort();
+    if (!S.classi[S.attiva]) S.attiva = nomi[0] || '';
+    $('sel-classe').innerHTML = nomi.length ? nomi.map(function (n) { return '<option' + (n === S.attiva ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') : '<option>—</option>';
+    if (!$('sel-data').value) $('sel-data').value = oggi();
+  }
+
+  function renderGriglia() {
+    var c = S.attiva, d = $('sel-data').value || oggi();
+    var box = $('v-griglia');
+    if (!c) { box.innerHTML = '<div class="vuoto">Nessuna classe sul dispositivo.<br><br><button class="btn primario" data-vai="classi">Aggiungi una classe</button></div>'; return; }
+    var st = S.classi[c].studenti;
+    var h = '<p class="info">' + esc(c) + ' · ' + dataIt(d) + ' · ' + contaRecord(c, d) + ' studenti con osservazioni. Tocca per passare da vuoto a + a − e di nuovo a vuoto.</p>';
+    h += '<table><thead><tr><th></th><th class="nome">Studente</th>';
+    ASPETTI.forEach(function (a) { h += '<th title="' + a[2] + '">' + a[1] + '</th>'; });
+    h += '<th>Nota</th></tr></thead><tbody>';
+    st.forEach(function (s) {
+      var k = c + '|' + d + '|' + s.n, r = S.rec[k] || {};
+      var aperta = notaAperta === k;
+      h += '<tr data-k="' + esc(k) + '"' + (aperta ? ' class="attiva"' : '') + '><td class="n">' + s.n + '</td><td class="nome" data-nota="1">' + esc(s.nome) + '</td>';
+      ASPETTI.forEach(function (a) {
+        var v = r[a[0]] || '';
+        h += '<td class="c"><button data-a="' + a[0] + '" class="' + (v === '+' ? 'piu' : v === '-' ? 'meno' : '') + '" aria-label="' + a[2] + ' ' + esc(s.nome) + ': ' + (v === '+' ? 'più' : v === '-' ? 'meno' : 'vuoto') + '">' + (v === '+' ? '+' : v === '-' ? '−' : '') + '</button></td>';
+      });
+      h += '<td class="c"><button class="nb' + (r.nota && r.nota.trim() ? ' ha' : '') + '" data-nota="1" aria-label="Nota per ' + esc(s.nome) + '">✎</button></td></tr>';
+      if (aperta) {
+        h += '<tr class="riga-nota"><td colspan="7"><textarea data-k="' + esc(k) + '" placeholder="Nota breve. Niente nomi di compagni, né riferimenti a famiglia o salute.">' + esc(r.nota || '') + '</textarea></td></tr>';
+      }
+    });
+    h += '</tbody></table>';
+    box.innerHTML = h;
+    if (notaAperta) { var ta = box.querySelector('textarea'); if (ta) ta.focus(); }
+  }
+
+  function aggiornaRecord(k, campo, valore) {
+    var r = S.rec[k] || { PAR: '', IMP: '', COL: '', USO: '', nota: '' };
+    r[campo] = valore; r.t = Date.now();
+    S.rec[k] = r;
+    salva();
+  }
+
+  $('v-griglia').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-a],[data-nota]');
+    if (!b) return;
+    var tr = b.closest('tr'); var k = tr && tr.getAttribute('data-k');
+    if (!k) return;
+    if (b.hasAttribute('data-a')) {
+      var a = b.getAttribute('data-a');
+      var v = (S.rec[k] || {})[a] || '';
+      var nuovo = v === '' ? '+' : v === '+' ? '-' : '';
+      aggiornaRecord(k, a, nuovo);
+      b.className = nuovo === '+' ? 'piu' : nuovo === '-' ? 'meno' : '';
+      b.textContent = nuovo === '+' ? '+' : nuovo === '-' ? '−' : '';
+      var info = $('v-griglia').querySelector('.info');
+      if (info) info.innerHTML = info.innerHTML.replace(/ · \d+ studenti con/, ' · ' + contaRecord(S.attiva, $('sel-data').value) + ' studenti con');
+    } else {
+      notaAperta = notaAperta === k ? null : k;
+      renderGriglia();
+    }
+  });
+  $('v-griglia').addEventListener('input', function (ev) {
+    var ta = ev.target;
+    if (ta.tagName !== 'TEXTAREA') return;
+    var k = ta.getAttribute('data-k');
+    aggiornaRecord(k, 'nota', ta.value);
+    var bt = $('v-griglia').querySelector('tr[data-k="' + CSS.escape(k) + '"] .nb');
+    if (bt) bt.classList.toggle('ha', !!ta.value.trim());
+  });
+
+  /* ---------------- vista classi */
+
+  function leggiElenco(testo) {
+    var out = [], usati = {}, prog = 0;
+    testo.split(/\r?\n/).forEach(function (riga) {
+      riga = riga.replace(/\s+$/, '').replace(/^\s+/, '');
+      if (!riga) return;
+      var m = riga.match(/^(\d{1,3})\s*[\t;,.)\-]?\s+(.+)$/) || riga.match(/^(\d{1,3})[\t;,](.+)$/);
+      var n, nome;
+      if (m) { n = parseInt(m[1], 10); nome = m[2].trim(); }
+      else { n = prog + 1; nome = riga; }
+      prog = n;
+      if (usati[n]) throw new Error('Il numero ' + n + ' compare due volte.');
+      usati[n] = true;
+      out.push({ n: n, nome: nome.replace(/\s+/g, ' ') });
+    });
+    return out;
+  }
+
+  function renderClassi() {
+    var nomi = Object.keys(S.classi).sort();
+    $('lista-classi').innerHTML = nomi.length ? nomi.map(function (c) {
+      return '<div class="riga-classe"><span class="nomecl">' + esc(c) + '</span><span class="det">' + S.classi[c].studenti.length + ' studenti · ' + contaRecord(c) + ' osservazioni</span>' +
+        '<button class="btn" data-mod="' + esc(c) + '">Modifica elenco</button><button class="btn pericolo" data-del="' + esc(c) + '">Elimina</button></div>';
+    }).join('') : '<p class="info">Nessuna classe.</p>';
+    $('titolo-form').textContent = modifica ? 'Modifica ' + modifica : 'Nuova classe';
+    $('f-annulla').hidden = !modifica;
+    $('f-nome').disabled = !!modifica;
+  }
+
+  $('f-salva').addEventListener('click', function () {
+    var nome = modifica || $('f-nome').value.trim().toUpperCase();
+    var msg = $('f-msg');
+    if (!nome) { msg.textContent = 'Manca il nome della classe.'; return; }
+    if (/[|]/.test(nome)) { msg.textContent = 'Il nome della classe non può contenere |.'; return; }
+    if (!modifica && S.classi[nome]) { msg.textContent = 'La classe ' + nome + ' esiste già: usa «Modifica elenco».'; return; }
+    var st;
+    try { st = leggiElenco($('f-elenco').value); } catch (e) { msg.textContent = e.message; return; }
+    if (!st.length) { msg.textContent = 'L\'elenco è vuoto.'; return; }
+    S.classi[nome] = { studenti: st };
+    S.attiva = nome;
+    salva();
+    msg.textContent = (modifica ? 'Elenco aggiornato: ' : 'Classe salvata: ') + nome + ', ' + st.length + ' studenti.';
+    modifica = null; $('f-nome').value = ''; $('f-elenco').value = '';
+    renderSelettori(); renderClassi(); mostraAvvisi();
+  });
+  $('f-annulla').addEventListener('click', function () { modifica = null; $('f-nome').value = ''; $('f-elenco').value = ''; $('f-msg').textContent = ''; renderClassi(); });
+
+  var confermaDel = null, timerDel = null;
+  $('lista-classi').addEventListener('click', function (ev) {
+    var m = ev.target.closest('[data-mod]'), d = ev.target.closest('[data-del]');
+    if (m) {
+      modifica = m.getAttribute('data-mod');
+      $('f-nome').value = modifica;
+      $('f-elenco').value = S.classi[modifica].studenti.map(function (s) { return s.n + '\t' + s.nome; }).join('\n');
+      $('f-msg').textContent = 'Attenzione: le osservazioni restano legate al numero, non al nome.';
+      renderClassi();
+      window.scrollTo(0, 0);
+    } else if (d) {
+      var c = d.getAttribute('data-del');
+      if (confermaDel !== c) {
+        confermaDel = c; d.textContent = 'Tocca di nuovo: elimina ' + c + ' e le sue osservazioni';
+        clearTimeout(timerDel); timerDel = setTimeout(function () { confermaDel = null; renderClassi(); }, 5000);
+        return;
+      }
+      delete S.classi[c];
+      Object.keys(S.rec).forEach(function (k) { if (k.split('|')[0] === c) delete S.rec[k]; });
+      delete S.esportato[c];
+      confermaDel = null; salva(); renderSelettori(); renderClassi(); mostraAvvisi();
+    }
+  });
+
+  /* ---------------- vista esporta */
+
+  function csvCampo(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }
+
+  function csvClasse(c) {
+    var righe = [['id', 'classe', 'data', 'n', 'PAR', 'IMP', 'COL', 'USO', 'nota'].join(';')];
+    Object.keys(S.rec).filter(function (k) { return k.split('|')[0] === c; }).sort(function (a, b) {
+      var pa = a.split('|'), pb = b.split('|');
+      return pa[1] < pb[1] ? -1 : pa[1] > pb[1] ? 1 : Number(pa[2]) - Number(pb[2]);
+    }).forEach(function (k) {
+      var p = k.split('|'), r = S.rec[k];
+      righe.push([k, p[0], p[1], p[2], r.PAR || '', r.IMP || '', r.COL || '', r.USO || '', (r.nota || '').replace(/\r?\n/g, ' ')].map(csvCampo).join(';'));
+    });
+    return righe.join('\r\n') + '\r\n';
+  }
+
+  function condividi(nome, testo, tipo) {
+    var blob = new Blob([testo], { type: tipo });
+    var file = null;
+    try { file = new File([blob], nome, { type: tipo }); } catch (e) { file = null; }
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+      return navigator.share({ files: [file], title: nome }).then(function () { return true; }, function (e) {
+        if (e && e.name === 'AbortError') return false;
+        scarica(blob, nome); return true;
+      });
+    }
+    scarica(blob, nome);
+    return Promise.resolve(true);
+  }
+  function scarica(blob, nome) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = nome;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  }
+
+  function renderEsporta() {
+    var nomi = Object.keys(S.classi).sort();
+    $('lista-esporta').innerHTML = nomi.length ? nomi.map(function (c) {
+      var ult = S.esportato[c];
+      return '<div class="riga-classe"><span class="nomecl">' + esc(c) + '</span><span class="det">' + contaRecord(c) + ' osservazioni · ' +
+        (ult ? 'ultima esportazione ' + new Date(ult).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' }) : 'mai esportata') + '</span>' +
+        '<button class="btn primario" data-exp="' + esc(c) + '">Esporta CSV</button></div>';
+    }).join('') : '<p class="info">Nessuna classe.</p>';
+    var st = $('stato-memoria');
+    st.textContent = standalone() ? 'Stai usando l\'app dalla schermata Home.' : 'Stai usando la pagina da Safari: aggiungila alla schermata Home.';
+    if (navigator.storage && navigator.storage.persisted) {
+      navigator.storage.persisted().then(function (p) { if (p) st.textContent += ' Memoria persistente concessa.'; });
+    }
+  }
+
+  $('lista-esporta').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-exp]');
+    if (!b) return;
+    var c = b.getAttribute('data-exp');
+    condividi('osservazioni_' + c + '_' + oggi() + '.csv', csvClasse(c), 'text/csv').then(function (ok) {
+      if (ok) { S.esportato[c] = Date.now(); salva(); renderEsporta(); mostraAvvisi(); }
+    });
+  });
+
+  $('backup').addEventListener('click', function () {
+    var dati = JSON.stringify({ tipo: 'osservazioni-rapide', versione: 1, creato: new Date().toISOString(), classi: S.classi, rec: S.rec, esportato: S.esportato }, null, 1);
+    condividi('osservazioni_copia_' + oggi() + '.json', dati, 'application/json').then(function (ok) {
+      if (ok) $('b-msg').textContent = 'Copia creata. Tienila sul Mac, non in una cartella condivisa.';
+    });
+  });
+
+  $('ripristina').addEventListener('change', function () {
+    var f = this.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function () {
+      try {
+        var o = JSON.parse(r.result);
+        if (o.tipo !== 'osservazioni-rapide') throw new Error('non è una copia di questa pagina');
+        Object.keys(o.classi || {}).forEach(function (c) { S.classi[c] = o.classi[c]; });
+        var agg = 0;
+        Object.keys(o.rec || {}).forEach(function (k) {
+          var nuovo = o.rec[k], vecchio = S.rec[k];
+          if (!vecchio || (nuovo.t || 0) > (vecchio.t || 0)) { S.rec[k] = nuovo; agg++; }
+        });
+        Object.keys(o.esportato || {}).forEach(function (c) { S.esportato[c] = Math.max(S.esportato[c] || 0, o.esportato[c]); });
+        salva(); renderSelettori(); renderEsporta(); mostraAvvisi();
+        $('b-msg').textContent = 'Ripristino fatto: ' + agg + ' osservazioni aggiunte o aggiornate. Le osservazioni più recenti già sul dispositivo sono state mantenute.';
+      } catch (e) { $('b-msg').textContent = 'File non valido: ' + e.message + '.'; }
+    };
+    r.readAsText(f);
+    this.value = '';
+  });
+
+  /* ---------------- navigazione */
+
+  var vista = 'griglia';
+  function vai(v) {
+    vista = v;
+    ['griglia', 'classi', 'esporta'].forEach(function (x) {
+      $('v-' + x).hidden = x !== v;
+      document.querySelector('nav [data-vista="' + x + '"]').setAttribute('aria-pressed', String(x === v));
+    });
+    if (v === 'griglia') renderGriglia();
+    if (v === 'classi') renderClassi();
+    if (v === 'esporta') renderEsporta();
+    mostraAvvisi();
+  }
+  document.querySelector('nav').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-vista]'); if (b) vai(b.getAttribute('data-vista'));
+  });
+  document.body.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-vai]'); if (b) vai(b.getAttribute('data-vai'));
+  });
+  $('sel-classe').addEventListener('change', function () { S.attiva = this.value; notaAperta = null; salva(); vai('griglia'); });
+  $('sel-data').addEventListener('change', function () { notaAperta = null; if (vista === 'griglia') renderGriglia(); });
+  $('prec').addEventListener('click', function () { $('sel-data').value = spostaGiorno($('sel-data').value || oggi(), -1); notaAperta = null; vai('griglia'); });
+  $('succ').addEventListener('click', function () { $('sel-data').value = spostaGiorno($('sel-data').value || oggi(), 1); notaAperta = null; vai('griglia'); });
+
+  function altezzaTestata() { document.documentElement.style.setProperty('--hh', $('testata').offsetHeight + 'px'); }
+  window.addEventListener('resize', altezzaTestata);
+
+  // al ritorno sull'app dopo ore, riporta la data a oggi
+  var ultimoGiorno = oggi();
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible' && oggi() !== ultimoGiorno) {
+      ultimoGiorno = oggi(); $('sel-data').value = ultimoGiorno; notaAperta = null; if (vista === 'griglia') renderGriglia();
+    }
+  });
+
+  carica();
+  renderSelettori();
+  altezzaTestata();
+  vai('griglia');
+  if (navigator.storage && navigator.storage.persist) { navigator.storage.persist().catch(function () {}); }
+  if ('serviceWorker' in navigator && location.protocol === 'https:') { navigator.serviceWorker.register('sw.js').catch(function () {}); }
+})();
+</script>
+</body>
+</html>
