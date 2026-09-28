@@ -80,7 +80,50 @@ textarea.elenco { min-height: 220px; font-family: ui-monospace, Menlo, monospace
 .riga-classe .nomecl { font-weight: 600; min-width: 60px; }
 .riga-classe .det { color: var(--muted); font-size: 14px; flex: 1; }
 .vuoto { text-align: center; color: var(--muted); padding: 40px 16px; }
+
+/* attività strutturate */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.chip { min-height: 36px; padding: 0 12px; border-radius: 18px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; font-size: 14px; }
+.chip.on { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+.gruppo-crit { margin: 10px 0 4px; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.crit-sel { display: flex; gap: 10px; align-items: flex-start; padding: 8px 4px; border-top: 1px solid var(--line); cursor: pointer; }
+.crit-sel input { width: 22px; height: 22px; margin-top: 1px; flex: none; }
+.crit-sel .sig { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--muted); }
+.crit-sel .gu { display: block; font-size: 13px; color: var(--muted); }
+select.testo { width: 100%; height: 42px; border: 1px solid var(--line); border-radius: 8px; padding: 0 10px; background: var(--bg); }
+.due { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stud { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 6px; }
+.stud-testa { display: flex; align-items: center; gap: 10px; padding: 10px 12px; cursor: pointer; min-height: 48px; }
+.stud-testa .n { width: 26px; text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+.stud-testa .nm { flex: 1; }
+.stud-testa .sint { font-size: 13px; color: var(--muted); text-align: right; }
+.stud.ha .stud-testa .nm { font-weight: 600; }
+.stud.aperto { border-color: var(--accent); }
+.stud-corpo { padding: 0 12px 12px; border-top: 1px solid var(--line); }
+.crit-riga { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.crit-riga .lab { flex: 1; min-width: 180px; }
+.crit-riga .lab b { font-weight: 600; }
+.crit-riga .lab .sig { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--muted); margin-left: 4px; }
+.crit-riga .lab .gu { display: block; font-size: 13px; color: var(--muted); }
+.liv { display: flex; gap: 6px; }
+.liv button { width: 48px; height: 44px; border-radius: 8px; border: 1px solid var(--line); background: transparent; font-size: 18px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.liv button.on { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+.stud-corpo textarea { width: 100%; min-height: 90px; margin-top: 10px; border: 1px solid var(--line); border-radius: 8px; padding: 8px; background: var(--bg); }
+.oss-sel { display: flex; gap: 10px; align-items: center; padding: 8px 4px; border-top: 1px solid var(--line); }
+.oss-sel input { width: 22px; height: 22px; }
+.oss-sel .det { color: var(--muted); font-size: 13px; margin-left: auto; text-align: right; }
+.crit-mod { display: grid; grid-template-columns: 1fr 120px; gap: 6px; padding: 10px 0; border-top: 1px solid var(--line); }
+.crit-mod .intero { grid-column: 1 / -1; }
+.crit-mod .az { grid-column: 1 / -1; display: flex; gap: 8px; }
+table.leg { font-size: 14px; margin-bottom: 8px; }
+table.leg td, table.leg th { padding: 6px 8px; text-align: left; vertical-align: top; }
+table.leg th { position: static; }
+table.leg td.s { font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
 @media (max-width: 560px) {
+  .due { grid-template-columns: 1fr; }
+  header { padding-left: 8px; padding-right: 8px; }
+  nav { flex-wrap: wrap; } nav button { padding: 0 9px; }
+  .liv button { width: 42px; }
   main { padding-left: 8px; padding-right: 8px; }
   td { padding: 3px 1px; } td.n { width: 24px; padding-right: 4px; font-size: 13px; }
   td.c { width: 42px; } td.c button, td.c .nb { width: 40px; height: 42px; font-size: 20px; }
@@ -99,8 +142,10 @@ textarea.elenco { min-height: 220px; font-family: ui-monospace, Menlo, monospace
   <span class="spazio"></span>
   <nav>
     <button data-vista="griglia" aria-pressed="true">Griglia</button>
+    <button data-vista="attivita" aria-pressed="false">Attività</button>
     <button data-vista="classi" aria-pressed="false">Classi</button>
     <button data-vista="esporta" aria-pressed="false">Esporta</button>
+    <button data-vista="legenda" aria-pressed="false">Legenda</button>
   </nav>
 </header>
 
@@ -108,6 +153,10 @@ textarea.elenco { min-height: 220px; font-family: ui-monospace, Menlo, monospace
   <div id="avvisi"></div>
 
   <div id="v-griglia"></div>
+
+  <div id="v-attivita" hidden></div>
+
+  <div id="v-legenda" hidden></div>
 
   <div id="v-classi" hidden>
     <section class="scheda">
@@ -132,7 +181,7 @@ textarea.elenco { min-height: 220px; font-family: ui-monospace, Menlo, monospace
   <div id="v-esporta" hidden>
     <section class="scheda">
       <h2>Esporta per il foglio</h2>
-      <p class="info">Il file contiene classe, data, numero, segni e annotazioni. Non contiene i nomi. Importalo nel foglio della classe con Valutazione › Importa osservazioni dall'iPad. Puoi esportare quante volte vuoi: le righe già importate vengono aggiornate, non duplicate.</p>
+      <p class="info">Osservazioni rapide della griglia. Il file contiene classe, data, numero, segni e annotazioni, non i nomi. Importalo nel foglio della classe con Valutazione › Importa dall'iPad. Puoi esportare quante volte vuoi: le righe già importate vengono aggiornate, non duplicate. Le sessioni di attività si esportano dalla scheda Attività.</p>
       <div id="lista-esporta"></div>
     </section>
     <section class="scheda">
@@ -158,7 +207,7 @@ textarea.elenco { min-height: 220px; font-family: ui-monospace, Menlo, monospace
   var KEY = 'osservazioni-rapide-v1';
   var ASPETTI = [['PAR', 'Partecip.', 'Partecipazione'], ['IMP', 'Impegno', 'Impegno'],
                  ['COL', 'Collab.', 'Collaborazione'], ['USO', 'Uso risc.', 'Uso dei riscontri']];
-  var S = { classi: {}, rec: {}, esportato: {}, attiva: '' };
+  var S = { classi: {}, rec: {}, esportato: {}, attiva: '', criteri: null, scelte: null, ultimaScelta: null, sessioni: {} };
   var memoriaOk = true;
   var notaAperta = null;
   var modifica = null;
@@ -173,7 +222,8 @@ textarea.elenco { min-height: 220px; font-family: ui-monospace, Menlo, monospace
   function carica() {
     try {
       var t = localStorage.getItem(KEY);
-      if (t) { var o = JSON.parse(t); S.classi = o.classi || {}; S.rec = o.rec || {}; S.esportato = o.esportato || {}; S.attiva = o.attiva || ''; }
+      if (t) { var o = JSON.parse(t); S.classi = o.classi || {}; S.rec = o.rec || {}; S.esportato = o.esportato || {}; S.attiva = o.attiva || '';
+        S.criteri = o.criteri || null; S.scelte = o.scelte || null; S.ultimaScelta = o.ultimaScelta || null; S.sessioni = o.sessioni || {}; }
     } catch (e) { memoriaOk = false; }
   }
   function salva() {
@@ -347,12 +397,13 @@ textarea.elenco { min-height: 220px; font-family: ui-monospace, Menlo, monospace
     } else if (d) {
       var c = d.getAttribute('data-del');
       if (confermaDel !== c) {
-        confermaDel = c; d.textContent = 'Tocca di nuovo: elimina ' + c + ' e le sue osservazioni';
+        confermaDel = c; d.textContent = 'Tocca di nuovo: elimina ' + c + ', osservazioni e sessioni';
         clearTimeout(timerDel); timerDel = setTimeout(function () { confermaDel = null; renderClassi(); }, 5000);
         return;
       }
       delete S.classi[c];
       Object.keys(S.rec).forEach(function (k) { if (k.split('|')[0] === c) delete S.rec[k]; });
+      Object.keys(S.sessioni).forEach(function (id) { if (S.sessioni[id].classe === c) delete S.sessioni[id]; });
       delete S.esportato[c];
       confermaDel = null; salva(); renderSelettori(); renderClassi(); mostraAvvisi();
     }
@@ -419,7 +470,9 @@ textarea.elenco { min-height: 220px; font-family: ui-monospace, Menlo, monospace
   });
 
   $('backup').addEventListener('click', function () {
-    var dati = JSON.stringify({ tipo: 'osservazioni-rapide', versione: 1, creato: new Date().toISOString(), classi: S.classi, rec: S.rec, esportato: S.esportato }, null, 1);
+    catalogo();
+    var dati = JSON.stringify({ tipo: 'osservazioni-rapide', versione: 2, creato: new Date().toISOString(), classi: S.classi, rec: S.rec, esportato: S.esportato,
+      criteri: S.criteri, scelte: S.scelte, ultimaScelta: S.ultimaScelta, sessioni: S.sessioni }, null, 1);
     condividi('osservazioni_copia_' + oggi() + '.json', dati, 'application/json').then(function (ok) {
       if (ok) $('b-msg').textContent = 'Copia creata. Tienila sul Mac, non in una cartella condivisa.';
     });
@@ -439,26 +492,399 @@ textarea.elenco { min-height: 220px; font-family: ui-monospace, Menlo, monospace
           if (!vecchio || (nuovo.t || 0) > (vecchio.t || 0)) { S.rec[k] = nuovo; agg++; }
         });
         Object.keys(o.esportato || {}).forEach(function (c) { S.esportato[c] = Math.max(S.esportato[c] || 0, o.esportato[c]); });
+        catalogo();
+        (o.criteri || []).forEach(function (c) { if (!S.criteri.some(function (x) { return x.id === c.id; })) S.criteri.push(c); });
+        (o.scelte || []).forEach(function (c) { if (!S.scelte.some(function (x) { return x.id === c.id; })) S.scelte.push(c); });
+        if (!S.ultimaScelta && o.ultimaScelta) S.ultimaScelta = o.ultimaScelta;
+        var ses = 0;
+        Object.keys(o.sessioni || {}).forEach(function (id) {
+          var nuovo = o.sessioni[id], vecchio = S.sessioni[id];
+          if (!vecchio || (nuovo.t || 0) > (vecchio.t || 0)) { S.sessioni[id] = nuovo; ses++; }
+        });
         salva(); renderSelettori(); renderEsporta(); mostraAvvisi();
-        $('b-msg').textContent = 'Ripristino fatto: ' + agg + ' osservazioni aggiunte o aggiornate. Le osservazioni più recenti già sul dispositivo sono state mantenute.';
+        $('b-msg').textContent = 'Ripristino fatto: ' + agg + ' osservazioni e ' + ses + ' sessioni aggiunte o aggiornate. Quelle più recenti già sul dispositivo sono state mantenute.';
       } catch (e) { $('b-msg').textContent = 'File non valido: ' + e.message + '.'; }
     };
     r.readAsText(f);
     this.value = '';
   });
 
+  /* ---------------- attività strutturate */
+
+  var DIM = {
+    'CON': ['Conoscenze', 'Conoscenze'],
+    'ABI-A': ['Analizzare un testo', 'Analizzare un testo'],
+    'ABI-B': ['Distinguere le branche della filosofia', 'Leggere un fenomeno per piani'],
+    'ABI-C': ['Contestualizzare e collegare', 'Collocare nel tempo e nello spazio'],
+    'ABI-D': ['Interpretare, confrontare, argomentare', 'Interpretare, confrontare, argomentare'],
+    'ABI-E': ['Comunicare', 'Comunicare'],
+    'PRO-INT': ['Interpretazione', 'Interpretazione'],
+    'PRO-CER': ['Cerca e contestualizza', 'Cerca e colloca'],
+    'PRO-COL': ['Collega', 'Analizza e collega'],
+    'PRO-ARG': ['Argomenta e comunica', 'Argomenta e comunica'],
+    'PRO-CTR': ['Controllo e regolazione', 'Controllo e regolazione']
+  };
+  var SIGLE = Object.keys(DIM);
+  var GRUPPI = [['CON', 'Conoscenze'], ['ABI', 'Abilità'], ['PRO', 'Processi cognitivi']];
+  var LIV = ['D', 'C', 'B', 'A'];
+  var PRESENZE = ['in classe', 'a casa + difesa orale', 'a casa'];
+  var CRITERI_BASE = [
+    { id: 'k01', etichetta: 'Conoscenza dei contenuti', sigla: 'CON', guarda: 'essenziale / ampia / completa' },
+    { id: 'k02', etichetta: 'Pertinenza e risposte alle domande', sigla: 'PRO-INT', guarda: 'coglie il punto della richiesta' },
+    { id: 'k03', etichetta: 'Esposizione: ordine e lessico', sigla: 'ABI-E', guarda: 'chiarezza, termini specifici, struttura' },
+    { id: 'k04', etichetta: 'Collegamenti', sigla: 'PRO-COL', guarda: 'solo se guidato / autonomi / su aspetti nuovi' },
+    { id: 'k05', etichetta: 'Costruzione dell\'argomento', sigla: 'PRO-ARG', guarda: 'tesi chiara, passaggi' },
+    { id: 'k06', etichetta: 'Confutazione', sigla: 'PRO-ARG', guarda: 'risponde all\'argomento, non alla persona' },
+    { id: 'k07', etichetta: 'Uso delle prove', sigla: 'ABI-D', guarda: 'fonti, esempi pertinenti' },
+    { id: 'k08', etichetta: 'Ascolto dell\'avversario', sigla: 'PRO-INT', guarda: 'riformula correttamente la tesi altrui' },
+    { id: 'k09', etichetta: 'Tema e concetti chiave', sigla: 'ABI-A', guarda: 'individua, definisce' },
+    { id: 'k10', etichetta: 'Tesi e struttura del testo', sigla: 'PRO-INT', guarda: 'gerarchia delle informazioni' },
+    { id: 'k11', etichetta: 'Contesto', sigla: 'PRO-CER', guarda: 'colloca autore, fonte, periodo' },
+    { id: 'k12', etichetta: 'Domande', sigla: 'PRO-INT', guarda: 'pone problemi, non solo chiede' },
+    { id: 'k13', etichetta: 'Revisione della posizione', sigla: 'PRO-CTR', guarda: 'cambia idea per buone ragioni' },
+    { id: 'k14', etichetta: 'Spiega le proprie scelte', sigla: 'PRO-CTR', guarda: 'sa dire come e perché' },
+    { id: 'k15', etichetta: 'Regge un\'obiezione', sigla: 'PRO-ARG', guarda: 'risponde nel merito' }
+  ];
+  var SCELTE_BASE = [
+    { id: 'p1', nome: 'Interrogazione', tipo: 'anche sommativa', presenza: 'in classe', criteri: ['k01', 'k02', 'k03', 'k04'] },
+    { id: 'p2', nome: 'Presentazione orale', tipo: 'anche sommativa', presenza: 'in classe', criteri: ['k01', 'k02', 'k03', 'k04'] },
+    { id: 'p3', nome: 'Dibattito', tipo: 'anche sommativa', presenza: 'in classe', criteri: ['k01', 'k05', 'k06', 'k07', 'k08'] },
+    { id: 'p4', nome: 'Analisi di un testo o di una fonte', tipo: 'anche sommativa', presenza: 'in classe', criteri: ['k03', 'k09', 'k10', 'k11'] },
+    { id: 'p5', nome: 'Discussione seminariale', tipo: 'anche sommativa', presenza: 'in classe', criteri: ['k04', 'k05', 'k12', 'k13'] },
+    { id: 'p6', nome: 'Difesa orale di un lavoro a casa', tipo: 'anche sommativa', presenza: 'a casa + difesa orale', criteri: ['k01', 'k14', 'k15'] }
+  ];
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function catalogo() {
+    if (!S.criteri) S.criteri = clone(CRITERI_BASE);
+    if (!S.scelte) S.scelte = clone(SCELTE_BASE);
+  }
+  function gruppoDi(sig) { return sig === 'CON' ? 'CON' : sig.slice(0, 3); }
+  function breveSigla(sig) { return sig === 'CON' ? 'CON' : sig.slice(4); }
+  function slug(s) { return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'attivita'; }
+  function opz(lista, sel) { return lista.map(function (x) { return '<option' + (x === sel ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join(''); }
+
+  var A = { modo: 'elenco', sid: null, aperto: null, bozza: null, msg: '', confDel: null };
+
+  function haDati(o) {
+    if (!o) return false;
+    return Object.keys(o.liv || {}).some(function (k) { return o.liv[k]; }) || !!(o.app && o.app.trim());
+  }
+  function sintesi(sess, o) {
+    if (!o) return '';
+    var p = [];
+    sess.criteri.forEach(function (c) { var l = (o.liv || {})[c.id]; if (l) p.push(breveSigla(c.sigla) + ' ' + l); });
+    if (o.app && o.app.trim()) p.push('✎');
+    return p.join(' · ');
+  }
+
+  function renderAttivita() {
+    catalogo();
+    var box = $('v-attivita');
+    if (A.modo === 'nuova') box.innerHTML = htmlNuova();
+    else if (A.modo === 'sessione' && S.sessioni[A.sid]) box.innerHTML = htmlSessione();
+    else if (A.modo === 'chiusura' && S.sessioni[A.sid]) box.innerHTML = htmlChiusura();
+    else if (A.modo === 'criteri') box.innerHTML = htmlCriteri();
+    else { A.modo = 'elenco'; box.innerHTML = htmlElenco(); }
+  }
+
+  function htmlElenco() {
+    var ids = Object.keys(S.sessioni).sort(function (a, b) {
+      var x = S.sessioni[a], y = S.sessioni[b];
+      return x.data < y.data ? 1 : x.data > y.data ? -1 : (y.creata || 0) - (x.creata || 0);
+    });
+    var h = '<section class="scheda"><h2>Attività strutturate</h2><p class="info">Interrogazioni, presentazioni, dibattiti, discussioni: scegli i criteri, osserva, poi esporta la sessione per il foglio della classe.</p>' +
+      '<div class="bottoni"><button class="btn primario" data-az="nuova">Nuova sessione</button><button class="btn" data-az="criteri">Criteri e scelte salvate</button></div></section>';
+    h += '<section class="scheda"><h2>Sessioni</h2>';
+    if (!ids.length) h += '<p class="info">Nessuna sessione.</p>';
+    ids.forEach(function (id) {
+      var s = S.sessioni[id];
+      var n = Object.keys(s.oss).filter(function (k) { return haDati(s.oss[k]); }).length;
+      var stato = s.esportata ? 'esportata il ' + new Date(s.esportata).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' }) : 'non esportata';
+      h += '<div class="riga-classe"><span class="nomecl">' + esc(s.classe) + '</span><span class="det">' + dataIt(s.data) + ' · ' + esc(s.titolo) + ' · ' + n + ' studenti con dati · ' + stato + '</span>' +
+        '<button class="btn" data-apri="' + id + '">Apri</button><button class="btn pericolo" data-elimina="' + id + '">' + (A.confDel === id ? 'Tocca di nuovo per eliminare' : 'Elimina') + '</button></div>';
+    });
+    return h + '</section>';
+  }
+
+  function nuovaBozza() {
+    var u = S.ultimaScelta;
+    A.bozza = { classe: S.attiva, data: $('sel-data').value || oggi(), titolo: '', tipo: u ? u.tipo : 'anche sommativa', presenza: u ? u.presenza : 'in classe', criteri: [], nomeScelta: '' };
+    A.msg = '';
+  }
+
+  function htmlNuova() {
+    var b = A.bozza, nomi = Object.keys(S.classi).sort();
+    var h = '<section class="scheda"><h2>Nuova sessione</h2>' +
+      '<div class="due"><div><label class="campo">Classe</label><select class="testo" data-b="classe">' + opz(nomi, b.classe) + '</select></div>' +
+      '<div><label class="campo">Data</label><input type="date" class="testo" data-b="data" value="' + esc(b.data) + '"></div></div>' +
+      '<label class="campo">Titolo</label><input class="testo" data-b="titolo" value="' + esc(b.titolo) + '" placeholder="es. Dibattito sul contrattualismo">' +
+      '<div class="due"><div><label class="campo">Tipo</label><select class="testo" data-b="tipo">' + opz(['anche sommativa', 'formativa'], b.tipo) + '</select></div>' +
+      '<div><label class="campo">Presenza</label><select class="testo" data-b="presenza">' + opz(PRESENZE, b.presenza) + '</select></div></div>' +
+      (b.tipo === 'formativa' ? '<p class="info">Formativa: in classe non compaiono i livelli, solo gli appunti.</p>' : '') +
+      '<label class="campo">Criteri osservati</label><div class="chips">' +
+      (S.ultimaScelta ? '<button class="chip" data-ultima="1">Come l\'ultima volta</button>' : '') +
+      S.scelte.map(function (s) { return '<button class="chip' + (b.nomeScelta === s.nome ? ' on' : '') + '" data-scelta="' + esc(s.id) + '">' + esc(s.nome) + '</button>'; }).join('') + '</div>';
+    GRUPPI.forEach(function (g) {
+      var cc = S.criteri.filter(function (c) { return gruppoDi(c.sigla) === g[0]; });
+      if (!cc.length) return;
+      h += '<div class="gruppo-crit">' + g[1] + '</div>';
+      cc.forEach(function (c) {
+        h += '<label class="crit-sel"><input type="checkbox" data-crit="' + esc(c.id) + '"' + (b.criteri.indexOf(c.id) >= 0 ? ' checked' : '') + '>' +
+          '<span><b>' + esc(c.etichetta) + '</b> <span class="sig">' + esc(c.sigla) + '</span><span class="gu">' + esc(c.guarda) + '</span></span></label>';
+      });
+    });
+    h += '<div class="bottoni"><input class="testo" id="nome-scelta" placeholder="Nome, per salvare questa scelta di criteri" style="flex:1;min-width:200px"><button class="btn" data-az="salva-scelta">Salva scelta</button></div>' +
+      '<div class="bottoni"><button class="btn primario" data-az="inizia">Inizia</button><button class="btn" data-az="elenco">Annulla</button></div>' +
+      '<p class="info" id="a-msg">' + esc(A.msg) + '</p></section>';
+    return h;
+  }
+
+  function htmlSessione() {
+    var s = S.sessioni[A.sid], st = (S.classi[s.classe] || { studenti: [] }).studenti, somm = s.tipo === 'anche sommativa';
+    var h = '<section class="scheda"><h2>' + esc(s.titolo) + '</h2><p class="info">' + esc(s.classe) + ' · ' + dataIt(s.data) + ' · ' + esc(s.tipo) + ' · ' +
+      s.criteri.map(function (c) { return esc(c.etichetta); }).join(', ') + '</p>' +
+      '<p class="info">Tocca uno studente per aprire la sua scheda.' + (somm ? ' I livelli sono facoltativi: toccane uno di nuovo per toglierlo.' : '') + '</p>' +
+      '<div class="bottoni"><button class="btn primario" data-az="chiudi">Chiudi e scegli gli osservati</button><button class="btn" data-az="elenco">Sessioni</button></div></section>';
+    if (!st.length) h += '<p class="vuoto">La classe ' + esc(s.classe) + ' non è più sul dispositivo.</p>';
+    st.forEach(function (x) {
+      var o = s.oss[x.n], ap = A.aperto === x.n;
+      h += '<div class="stud' + (haDati(o) ? ' ha' : '') + (ap ? ' aperto' : '') + '"><div class="stud-testa" data-stud="' + x.n + '"><span class="n">' + x.n + '</span><span class="nm">' + esc(x.nome) + '</span><span class="sint">' + esc(sintesi(s, o)) + '</span></div>';
+      if (ap) {
+        h += '<div class="stud-corpo">';
+        s.criteri.forEach(function (c) {
+          var l = ((o || {}).liv || {})[c.id] || '';
+          h += '<div class="crit-riga"><div class="lab"><b>' + esc(c.etichetta) + '</b><span class="sig">' + esc(c.sigla) + '</span><span class="gu">' + esc(c.guarda || '') + '</span></div>';
+          if (somm) h += '<div class="liv">' + LIV.map(function (L) { return '<button data-liv="' + L + '" data-c="' + esc(c.id) + '" class="' + (l === L ? 'on' : '') + '" aria-label="' + esc(c.etichetta) + ' livello ' + L + '">' + L + '</button>'; }).join('') + '</div>';
+          h += '</div>';
+        });
+        h += '<textarea data-app="' + x.n + '" placeholder="Appunti: che cosa ha detto o fatto, passaggi riusciti, che cosa manca. Niente nomi di compagni.">' + esc((o || {}).app || '') + '</textarea></div>';
+      }
+      h += '</div>';
+    });
+    return h;
+  }
+
+  function htmlChiusura() {
+    var s = S.sessioni[A.sid], st = (S.classi[s.classe] || { studenti: [] }).studenti;
+    var h = '<section class="scheda"><h2>Chi hai osservato?</h2><p class="info">Sono spuntati gli studenti con almeno un dato. Togli o aggiungi la spunta: nel file vanno solo gli spuntati; gli altri restano vuoti nel foglio.</p>';
+    st.forEach(function (x) {
+      var o = s.oss[x.n];
+      var sel = s.osservati ? !!s.osservati[x.n] : haDati(o);
+      h += '<label class="oss-sel"><input type="checkbox" data-oss="' + x.n + '"' + (sel ? ' checked' : '') + '><span>' + x.n + ' · ' + esc(x.nome) + '</span><span class="det">' + esc(sintesi(s, o)) + '</span></label>';
+    });
+    h += '<div class="bottoni"><button class="btn primario" data-az="esporta-sessione">Esporta per il foglio</button><button class="btn" data-az="torna">Torna alla sessione</button></div>' +
+      '<p class="info" id="a-msg">' + esc(A.msg) + '</p></section>';
+    return h;
+  }
+
+  function htmlCriteri() {
+    var h = '<section class="scheda"><h2>Catalogo dei criteri</h2><p class="info">Ogni criterio ha un\'etichetta tua, una sigla di dimensione e un promemoria di che cosa guardare. Più criteri possono avere la stessa sigla. Le modifiche valgono per le sessioni nuove: quelle già create conservano i criteri con cui sono nate.</p>';
+    S.criteri.forEach(function (c) {
+      h += '<div class="crit-mod"><input class="testo" data-ce="' + esc(c.id) + '" data-f="etichetta" value="' + esc(c.etichetta) + '" aria-label="Etichetta">' +
+        '<select class="testo" data-ce="' + esc(c.id) + '" data-f="sigla" aria-label="Sigla">' + opz(SIGLE, c.sigla) + '</select>' +
+        '<input class="testo intero" data-ce="' + esc(c.id) + '" data-f="guarda" value="' + esc(c.guarda || '') + '" placeholder="Che cosa guardo" aria-label="Che cosa guardo">' +
+        '<div class="az"><button class="btn pericolo" data-elcrit="' + esc(c.id) + '">' + (A.confDel === c.id ? 'Tocca di nuovo per eliminare' : 'Elimina') + '</button></div></div>';
+    });
+    h += '<div class="bottoni"><button class="btn primario" data-az="aggiungi-criterio">Aggiungi criterio</button></div></section>';
+    h += '<section class="scheda"><h2>Scelte salvate</h2>';
+    if (!S.scelte.length) h += '<p class="info">Nessuna.</p>';
+    S.scelte.forEach(function (s) {
+      var et = s.criteri.map(function (id) { var c = S.criteri.filter(function (x) { return x.id === id; })[0]; return c ? c.etichetta : null; }).filter(Boolean).join(', ');
+      h += '<div class="riga-classe"><span class="nomecl">' + esc(s.nome) + '</span><span class="det">' + esc(et) + '</span><button class="btn pericolo" data-elscelta="' + esc(s.id) + '">' + (A.confDel === s.id ? 'Tocca di nuovo' : 'Elimina') + '</button></div>';
+    });
+    h += '<div class="bottoni"><button class="btn" data-az="ripristina-base">Ripristina criteri e scelte di partenza mancanti</button><button class="btn" data-az="elenco">Fatto</button></div></section>';
+    return h;
+  }
+
+  function attivitaVai(modo) { A.modo = modo; A.confDel = null; renderAttivita(); window.scrollTo(0, 0); }
+
+  function toccaSessione(s) { s.t = Date.now(); salva(); }
+
+  function applicaScelta(sc) {
+    A.bozza.criteri = sc.criteri.filter(function (id) { return S.criteri.some(function (c) { return c.id === id; }); });
+    A.bozza.tipo = sc.tipo; A.bozza.presenza = sc.presenza; A.bozza.nomeScelta = sc.nome || '';
+  }
+
+  $('v-attivita').addEventListener('click', function (ev) {
+    var t = ev.target, el;
+    if ((el = t.closest('[data-az]'))) {
+      var az = el.getAttribute('data-az');
+      if (az === 'nuova') {
+        if (!Object.keys(S.classi).length) { vai('classi'); return; }
+        nuovaBozza(); attivitaVai('nuova');
+      } else if (az === 'criteri') attivitaVai('criteri');
+      else if (az === 'elenco') attivitaVai('elenco');
+      else if (az === 'salva-scelta') {
+        var nome = $('nome-scelta').value.trim();
+        if (!nome) { A.msg = 'Scrivi un nome per la scelta.'; renderAttivita(); return; }
+        if (!A.bozza.criteri.length) { A.msg = 'Spunta almeno un criterio.'; renderAttivita(); return; }
+        S.scelte = S.scelte.filter(function (s) { return s.nome !== nome; });
+        S.scelte.push({ id: 'u' + Date.now().toString(36), nome: nome, tipo: A.bozza.tipo, presenza: A.bozza.presenza, criteri: A.bozza.criteri.slice() });
+        A.bozza.nomeScelta = nome; A.msg = 'Scelta «' + nome + '» salvata.'; salva(); renderAttivita();
+      } else if (az === 'inizia') {
+        var b = A.bozza;
+        if (!S.classi[b.classe]) { A.msg = 'Scegli una classe.'; renderAttivita(); return; }
+        if (!b.titolo.trim()) { A.msg = 'Manca il titolo.'; renderAttivita(); return; }
+        if (!b.criteri.length && b.tipo === 'anche sommativa') { A.msg = 'Spunta almeno un criterio.'; renderAttivita(); return; }
+        var sel = S.criteri.filter(function (c) { return b.criteri.indexOf(c.id) >= 0; });
+        var id = 's' + Date.now().toString(36);
+        S.sessioni[id] = { id: id, classe: b.classe, data: b.data || oggi(), titolo: b.titolo.trim(), tipo: b.tipo, presenza: b.presenza,
+          modello: b.nomeScelta || 'criteri scelti', criteri: clone(sel), oss: {}, osservati: null, esportata: 0, creata: Date.now(), t: Date.now() };
+        S.ultimaScelta = { criteri: b.criteri.slice(), tipo: b.tipo, presenza: b.presenza };
+        salva(); A.sid = id; A.aperto = null; attivitaVai('sessione');
+      } else if (az === 'chiudi') { A.msg = ''; attivitaVai('chiusura'); }
+      else if (az === 'torna') attivitaVai('sessione');
+      else if (az === 'esporta-sessione') esportaSessione();
+      else if (az === 'aggiungi-criterio') {
+        S.criteri.push({ id: 'u' + Date.now().toString(36), etichetta: 'Nuovo criterio', sigla: 'CON', guarda: '' });
+        salva(); renderAttivita();
+        var ins = $('v-attivita').querySelectorAll('[data-f="etichetta"]'); if (ins.length) { ins[ins.length - 1].focus(); ins[ins.length - 1].select(); }
+      } else if (az === 'ripristina-base') {
+        CRITERI_BASE.forEach(function (c) { if (!S.criteri.some(function (x) { return x.id === c.id; })) S.criteri.push(clone(c)); });
+        SCELTE_BASE.forEach(function (c) { if (!S.scelte.some(function (x) { return x.id === c.id; })) S.scelte.push(clone(c)); });
+        salva(); renderAttivita();
+      }
+      return;
+    }
+    if ((el = t.closest('[data-ultima]'))) { applicaScelta(S.ultimaScelta); A.bozza.nomeScelta = ''; renderAttivita(); return; }
+    if ((el = t.closest('[data-scelta]'))) {
+      var sc = S.scelte.filter(function (s) { return s.id === el.getAttribute('data-scelta'); })[0];
+      if (sc) { applicaScelta(sc); renderAttivita(); }
+      return;
+    }
+    if ((el = t.closest('[data-apri]'))) { A.sid = el.getAttribute('data-apri'); A.aperto = null; attivitaVai('sessione'); return; }
+    if ((el = t.closest('[data-elimina]'))) {
+      var sid = el.getAttribute('data-elimina');
+      if (A.confDel !== sid) { A.confDel = sid; renderAttivita(); return; }
+      delete S.sessioni[sid]; A.confDel = null; salva(); renderAttivita(); return;
+    }
+    if ((el = t.closest('[data-elcrit]'))) {
+      var cid = el.getAttribute('data-elcrit');
+      if (A.confDel !== cid) { A.confDel = cid; renderAttivita(); return; }
+      S.criteri = S.criteri.filter(function (c) { return c.id !== cid; });
+      S.scelte.forEach(function (s) { s.criteri = s.criteri.filter(function (x) { return x !== cid; }); });
+      A.confDel = null; salva(); renderAttivita(); return;
+    }
+    if ((el = t.closest('[data-elscelta]'))) {
+      var pid = el.getAttribute('data-elscelta');
+      if (A.confDel !== pid) { A.confDel = pid; renderAttivita(); return; }
+      S.scelte = S.scelte.filter(function (s) { return s.id !== pid; });
+      A.confDel = null; salva(); renderAttivita(); return;
+    }
+    if ((el = t.closest('[data-stud]'))) {
+      var n = Number(el.getAttribute('data-stud'));
+      A.aperto = A.aperto === n ? null : n;
+      renderAttivita();
+      var ap = $('v-attivita').querySelector('.stud.aperto');
+      if (ap && ap.getBoundingClientRect().top < 70) ap.scrollIntoView({ block: 'start' });
+      return;
+    }
+    if ((el = t.closest('[data-liv]'))) {
+      var s = S.sessioni[A.sid], cc = el.getAttribute('data-c'), L = el.getAttribute('data-liv');
+      var o = s.oss[A.aperto] || (s.oss[A.aperto] = { liv: {}, app: '' });
+      o.liv[cc] = o.liv[cc] === L ? '' : L;
+      toccaSessione(s);
+      el.parentNode.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x.getAttribute('data-liv') === o.liv[cc]); });
+      aggiornaTestaStud(s);
+      return;
+    }
+  });
+
+  function aggiornaTestaStud(s) {
+    var box = $('v-attivita').querySelector('.stud.aperto');
+    if (!box) return;
+    var o = s.oss[A.aperto];
+    box.classList.toggle('ha', haDati(o));
+    box.querySelector('.sint').textContent = sintesi(s, o);
+  }
+
+  $('v-attivita').addEventListener('input', function (ev) {
+    var t = ev.target;
+    if (t.hasAttribute('data-app')) {
+      var s = S.sessioni[A.sid], n = Number(t.getAttribute('data-app'));
+      var o = s.oss[n] || (s.oss[n] = { liv: {}, app: '' });
+      o.app = t.value; toccaSessione(s); aggiornaTestaStud(s);
+    } else if (t.hasAttribute('data-b')) {
+      A.bozza[t.getAttribute('data-b')] = t.value;
+      if (t.getAttribute('data-b') === 'tipo') renderAttivita();
+    } else if (t.hasAttribute('data-ce')) {
+      var c = S.criteri.filter(function (x) { return x.id === t.getAttribute('data-ce'); })[0];
+      if (c) { c[t.getAttribute('data-f')] = t.value; salva(); }
+    }
+  });
+  $('v-attivita').addEventListener('change', function (ev) {
+    var t = ev.target;
+    if (t.hasAttribute('data-crit')) {
+      var id = t.getAttribute('data-crit'), cr = A.bozza.criteri;
+      if (t.checked && cr.indexOf(id) < 0) cr.push(id);
+      if (!t.checked) A.bozza.criteri = cr.filter(function (x) { return x !== id; });
+      A.bozza.nomeScelta = '';
+      $('v-attivita').querySelectorAll('.chip.on').forEach(function (x) { x.classList.remove('on'); });
+    } else if (t.hasAttribute('data-oss')) {
+      var s = S.sessioni[A.sid];
+      if (!s.osservati) {
+        s.osservati = {};
+        (S.classi[s.classe] || { studenti: [] }).studenti.forEach(function (x) { if (haDati(s.oss[x.n])) s.osservati[x.n] = true; });
+      }
+      var n = Number(t.getAttribute('data-oss'));
+      if (t.checked) s.osservati[n] = true; else delete s.osservati[n];
+      toccaSessione(s);
+    } else if (t.hasAttribute('data-b') || t.hasAttribute('data-ce')) {
+      // select: già gestito da input in molti browser, ma non in tutti
+      t.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
+
+  function esportaSessione() {
+    var s = S.sessioni[A.sid];
+    var st = (S.classi[s.classe] || { studenti: [] }).studenti;
+    var sel = {};
+    $('v-attivita').querySelectorAll('[data-oss]').forEach(function (x) { if (x.checked) sel[x.getAttribute('data-oss')] = true; });
+    s.osservati = sel;
+    var oss = st.filter(function (x) { return sel[x.n]; }).map(function (x) {
+      var o = s.oss[x.n] || { liv: {}, app: '' }, liv = {};
+      s.criteri.forEach(function (c) { if (o.liv && o.liv[c.id]) liv[c.id] = o.liv[c.id]; });
+      return { n: x.n, livelli: s.tipo === 'anche sommativa' ? liv : {}, appunti: (o.app || '').trim() };
+    });
+    if (!oss.length) { A.msg = 'Nessuno studente spuntato.'; renderAttivita(); return; }
+    var dati = { tipo: 'sessione-attivita', versione: 1, id: s.id, classe: s.classe, data: s.data, titolo: s.titolo,
+      tipoAttivita: s.tipo, presenza: s.presenza, modello: s.modello,
+      criteri: s.criteri.map(function (c) { return { id: c.id, etichetta: c.etichetta, sigla: c.sigla }; }), osservati: oss };
+    condividi('attivita_' + s.classe + '_' + s.data + '_' + slug(s.titolo) + '.json', JSON.stringify(dati, null, 1), 'application/json').then(function (ok) {
+      if (ok) { s.esportata = Date.now(); toccaSessione(s); A.msg = 'Esportata: ' + oss.length + ' studenti. Importala nel foglio con Valutazione › Importa dall\'iPad.'; renderAttivita(); }
+    });
+  }
+
+  /* ---------------- legenda */
+
+  function renderLegenda() {
+    var h = '<section class="scheda"><h2>Dimensioni</h2><table class="leg"><thead><tr><th>Sigla</th><th>Filosofia</th><th>Storia</th></tr></thead><tbody>';
+    SIGLE.forEach(function (k) { h += '<tr><td class="s">' + k + '</td><td>' + esc(DIM[k][0]) + '</td><td>' + esc(DIM[k][1]) + '</td></tr>'; });
+    h += '<tr><td class="s">DIS-…</td><td colspan="2">Disposizioni (PAR, IMP, COL, USO): solo nella griglia rapida e nei bilanci, mai nelle attività.</td></tr></tbody></table></section>';
+    h += '<section class="scheda"><h2>Livelli</h2><table class="leg"><thead><tr><th>Livello</th><th>Significato</th><th>Voto (§ 3.6)</th></tr></thead><tbody>' +
+      '<tr><td class="s">D</td><td>Base non raggiunto</td><td>sotto 6</td></tr><tr><td class="s">C</td><td>Base</td><td>6</td></tr>' +
+      '<tr><td class="s">B</td><td>Intermedio</td><td>7-8</td></tr><tr><td class="s">A</td><td>Avanzato</td><td>9-10</td></tr></tbody></table>' +
+      '<p class="info">In classe il livello è facoltativo e resta modificabile nel foglio. Più criteri con la stessa sigla danno livelli distinti: nessuna media.</p></section>';
+    h += '<section class="scheda"><h2>Regole</h2><p class="info">Un livello sui processi (PRO-) vale solo se l\'attività è in classe o c\'è una difesa orale. Entra nel giudizio solo ciò che ha ricevuto un riscontro copiato sul registro.</p>' +
+      '<h2 style="margin-top:12px">Griglia rapida</h2><p class="info">PAR partecipazione · IMP impegno · COL collaborazione · USO uso dei riscontri. Un segno per aspetto, studente e giorno: + oppure −.</p></section>';
+    $('v-legenda').innerHTML = h;
+  }
+
   /* ---------------- navigazione */
 
   var vista = 'griglia';
   function vai(v) {
     vista = v;
-    ['griglia', 'classi', 'esporta'].forEach(function (x) {
+    ['griglia', 'attivita', 'classi', 'esporta', 'legenda'].forEach(function (x) {
       $('v-' + x).hidden = x !== v;
       document.querySelector('nav [data-vista="' + x + '"]').setAttribute('aria-pressed', String(x === v));
     });
     if (v === 'griglia') renderGriglia();
     if (v === 'classi') renderClassi();
     if (v === 'esporta') renderEsporta();
+    if (v === 'attivita') renderAttivita();
+    if (v === 'legenda') renderLegenda();
     mostraAvvisi();
   }
   document.querySelector('nav').addEventListener('click', function (ev) {

@@ -1,5 +1,5 @@
 // Tiene la pagina disponibile anche senza rete. I dati non passano da qui: stanno nella memoria del dispositivo.
-const CACHE = 'osservazioni-v1';
+const CACHE = 'osservazioni-v2';
 const FILE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
